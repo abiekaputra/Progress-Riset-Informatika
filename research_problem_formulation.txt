@@ -1,0 +1,144 @@
+
+================================================================================
+           RESEARCH PROBLEM FORMULATION
+================================================================================
+
+Judul: Metode Hibrida EfficientNet-B0 dan Prototypical Network untuk 
+       Klasifikasi Multikelas Diabetic Retinopathy
+
+Peneliti: Abi Eka Putra Wulyono (22081010190)
+Program Studi: Informatika - UPN Veteran Jawa Timur
+
+================================================================================
+1. IDENTIFY BROAD FIELD
+================================================================================
+
+Bidang Luas         : Computer Vision & Medical Imaging
+Fokus Utama         : Deep Learning untuk Computer-Aided Diagnosis (CAD)
+Domain Aplikasi     : Klasifikasi tingkat keparahan Diabetic Retinopathy
+
+================================================================================
+2. DISSECT THE SUBAREAS
+================================================================================
+
+a) Deep Learning for Medical Imaging
+   - Penerapan CNN untuk analisis citra fundus retina
+   - Transfer learning dari pretrained models
+   
+b) Few-Shot Learning
+   - Metric-based learning (Prototypical Networks)
+   - Episodic training paradigm
+   
+c) Class Imbalance Handling
+   - Penanganan distribusi data tidak seimbang pada citra medis
+   - Alternative to traditional resampling methods
+
+d) Efficient Neural Architectures
+   - EfficientNet compound scaling
+   - Resource-efficient models untuk medical deployment
+
+================================================================================
+3. SELECT INTERESTED SUB-AREA
+================================================================================
+
+Fokus Penelitian:
+Integrasi end-to-end antara EfficientNet-B0 (feature extractor) dengan 
+Prototypical Network (classifier) untuk menangani klasifikasi multikelas 
+Diabetic Retinopathy pada dataset dengan ketidakseimbangan kelas.
+
+Alasan Pemilihan:
+- EfficientNet-B0: Efisien (5.3M params), compound scaling optimal
+- Prototypical Network: Few-shot learning cocok untuk class imbalance
+- End-to-end training: Joint optimization untuk representasi optimal
+
+================================================================================
+4. RAISE RESEARCH QUESTIONS
+================================================================================
+
+RQ1: Bagaimana penerapan model hibrida EfficientNet-B0 dan Prototypical 
+     Network untuk klasifikasi multikelas Diabetic Retinopathy?
+
+RQ2: Bagaimana pengaruh integrasi Prototypical Network terhadap performa 
+     klasifikasi dibandingkan model baseline (EfficientNet-B0 + Softmax)?
+
+Sub-Questions:
+- Apakah episodic training meningkatkan performa pada kelas minoritas?
+- Bagaimana pola confusion antar tingkat keparahan DR?
+- Apakah embedding space yang dihasilkan lebih diskriminatif?
+
+================================================================================
+5. FORMULATE OBJECTIVES
+================================================================================
+
+Tujuan Utama:
+1. Menerapkan model hibrida EfficientNet-B0 + Prototypical Network secara
+   end-to-end untuk klasifikasi 5 tingkat keparahan DR
+
+2. Menganalisis pengaruh integrasi Prototypical Network terhadap performa
+   klasifikasi, khususnya pada kelas minoritas (Mild & Severe)
+
+Tujuan Spesifik:
+- Implementasi preprocessing (Circle Crop, Ben Graham)
+- Membangun pipeline episodic training
+- Evaluasi menggunakan macro-averaged metrics & QWK
+- Analisis embedding space dan prototype positions
+- Perbandingan statistik baseline vs hybrid model
+
+================================================================================
+6. ASSESSMENT OF OBJECTIVES
+================================================================================
+
+Kriteria       Status   Justifikasi
+-----------    ------   ----------------------------------------------------
+Feasible       ✅       Dataset publik (APTOS 2019), library tersedia
+                        (PyTorch), computational resource available
+
+Relevant       ✅       DR prevalensi tinggi (22.27% penderita diabetes),
+                        kebutuhan CAD system untuk skrining massal
+
+Significant    ✅       Novel integration belum dieksplorasi, kontribusi
+                        few-shot learning untuk medical class imbalance
+
+Achievable     ✅       Timeline 16 minggu, scope terbatas pada APTOS 2019,
+                        single backbone (EfficientNet-B0)
+
+================================================================================
+7. DOUBLE CHECK
+================================================================================
+
+Validasi Pemilihan Metode:
+
+✓ EfficientNet-B0: Terbukti efektif untuk medical imaging [16][17][28]
+✓ Prototypical Network: State-of-the-art few-shot learning [23][34][26]
+✓ Integration gap: Tidak ada penelitian yang menggabungkan keduanya
+✓ Dataset: APTOS 2019 widely used, class imbalance (ratio 9.35:1)
+✓ Evaluation: Comprehensive metrics (macro-avg, QWK) untuk imbalanced data
+
+Potensi Risiko & Mitigasi:
+- Risiko: Episodic training lebih lambat
+  Mitigasi: GPU acceleration, batch optimization
+  
+- Risiko: Performa mungkin tidak selalu lebih baik dari baseline
+  Mitigasi: Multiple random seeds, statistical testing
+  
+- Risiko: Overfitting pada kelas minoritas
+  Mitigasi: Early stopping, validation monitoring
+
+================================================================================
+REFERENSI UTAMA
+================================================================================
+
+[14] M. Tan and Q. V. Le, "EfficientNet: Rethinking Model Scaling for 
+     Convolutional Neural Networks," arXiv:1905.11946, 2020.
+
+[23] J. Snell et al., "Prototypical Networks for Few-shot Learning," 
+     arXiv:1703.05175, 2017.
+
+[16] L. Arora et al., "Ensemble deep learning and EfficientNet for accurate
+     diagnosis of diabetic retinopathy," Sci Rep, vol. 14, 2024.
+
+[34] M. Murugappan et al., "A novel few-shot classification framework for
+     diabetic retinopathy detection and grading," Measurement, 2022.
+
+[26] A. Ouahab and O. Ben Ahmed, "ProtoMed: Prototypical networks with
+     auxiliary regularization," Image Vis Comput, 2025.

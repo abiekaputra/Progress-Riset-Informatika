@@ -1,0 +1,295 @@
+
+================================================================================
+                    METHODOLOGY
+================================================================================
+
+Peneliti: Abi Eka Putra Wulyono (22081010190)
+Metode: Hybrid EfficientNet-B0 & Prototypical Network (End-to-End)
+
+================================================================================
+1. DESAIN PENELITIAN
+================================================================================
+
+Jenis Penelitian : Eksperimen Kuantitatif
+Pendekatan       : Supervised Learning + Few-Shot Learning
+Paradigma        : Metric-Based Meta-Learning
+
+================================================================================
+2. ALUR PENELITIAN
+================================================================================
+
+Phase 1: PREPARATION (Week 1-2)
+├─ Literature review (38+ papers)
+├─ Research gap identification
+├─ Methodology design
+└─ Environment setup
+
+Phase 2: DATA PREPARATION (Week 3-4)
+├─ Download APTOS 2019 dataset (3,662 images)
+├─ Exploratory Data Analysis (EDA)
+├─ Class distribution analysis
+├─ Preprocessing implementation:
+│  ├─ Circle Crop
+│  ├─ Ben Graham preprocessing
+│  └─ Normalization & Resize
+└─ Stratified train-val split (80:20)
+
+Phase 3: MODEL DEVELOPMENT (Week 5-8)
+├─ EfficientNet-B0 implementation
+├─ Prototypical Network implementation
+├─ End-to-end integration
+├─ Episodic training loop
+└─ Logging & monitoring setup
+
+Phase 4: TRAINING & TUNING (Week 9-12)
+├─ Baseline training (EfficientNet-B0 + Softmax)
+├─ Hybrid model training (EfficientNet-B0 + ProtoNet)
+├─ Hyperparameter optimization
+└─ Cross-validation experiments
+
+Phase 5: EVALUATION (Week 13-14)
+├─ Metrics computation
+├─ Confusion matrix analysis
+├─ Statistical significance testing
+└─ Visualization (t-SNE, prototypes)
+
+Phase 6: DOCUMENTATION (Week 15-16)
+├─ Results analysis & interpretation
+├─ Thesis writing
+└─ GitHub repository finalization
+
+================================================================================
+3. DATASET DAN PREPROCESSING
+================================================================================
+
+Dataset: APTOS 2019 Blindness Detection
+Source: Kaggle Competition
+URL: https://kaggle.com/c/aptos2019-blindness-detection
+
+Karakteristik:
+- Total sampel: 3,662 fundus images
+- Format: JPEG/PNG (high-resolution)
+- Labels: 5 kelas (0-4, ordinal severity)
+
+Class Distribution:
+Class 0 (No DR)        : 1,805 samples (49.3%)
+Class 1 (Mild)         :   370 samples (10.1%)  ← Minority
+Class 2 (Moderate)     :   999 samples (27.3%)
+Class 3 (Severe)       :   193 samples (5.3%)   ← Minority
+Class 4 (Proliferative):   295 samples (8.1%)   ← Minority
+
+Imbalance Ratio: 9.35:1 (Class 0 / Class 3)
+
+-------------------------------------------------------------------------------
+
+Preprocessing Pipeline:
+
+Step 1: Circle Crop
+Tujuan: Remove black borders, focus retinal region
+Method:
+1. Grayscale conversion
+2. Gaussian blur (σ=5)
+3. Threshold detection
+4. Find largest contour (retina)
+5. Crop to bounding box + padding
+
+Step 2: Ben Graham Preprocessing
+Tujuan: Enhance vessel contrast, standardize illumination
+Method:
+1. Compute local average color (Gaussian σ=10)
+2. Subtract: enhanced = original - local_avg
+3. Add offset (+128)
+4. Clip to [0, 255]
+
+Step 3: Normalization & Resize
+Tujuan: Prepare input for EfficientNet-B0
+Method:
+1. Resize to 224×224
+2. Scale to [0, 1]
+3. ImageNet normalization (mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225])
+
+Output: Preprocessed images (224×224×3, float32)
+
+================================================================================
+4. MODEL DEVELOPMENT
+================================================================================
+
+4.1 BASELINE MODEL
+------------------
+
+Architecture: EfficientNet-B0 + Softmax Classifier
+
+EfficientNet-B0:
+- Parameters: 5.3M
+- Input: 224×224×3
+- Output: 1280-dim features (Global Average Pooling)
+- Pretrained: ImageNet weights
+
+Classification Head:
+- FC(1280 → 5) + Softmax
+- Loss: Cross-Entropy
+- Optimizer: Adam (lr=1e-4)
+
+Training:
+- Batch size: 32
+- Epochs: 100 (early stopping patience=10)
+- Augmentation: None (preserve medical integrity)
+
+
+4.2 PROPOSED HYBRID MODEL
+--------------------------
+
+Architecture: EfficientNet-B0 + Prototypical Network (End-to-End)
+
+Component 1: Feature Extractor (EfficientNet-B0)
+Input: 224×224×3 fundus image
+↓
+[Stem Conv] → [MBConv Blocks (7 stages)] → [Head Conv 1×1]
+↓
+Global Average Pooling
+↓
+Output: 1280-dim embedding
+
+Component 2: Embedding Projection
+1280-dim → FC → 128-dim → L2 Normalization
+
+Component 3: Prototypical Classifier
+For each class c:
+  prototype_c = mean(support_embeddings_c)
+
+For query embedding q:
+  distance_c = ||q - prototype_c||²
+  probability_c = exp(-distance_c) / Σ exp(-distance_k)
+
+Loss: Prototypical Loss = -log(probability_true_class)
+
+Training Strategy: Episodic Training
+- N-way: 5 classes per episode
+- K-shot: 5 support samples per class
+- Q-query: 15 query samples per class
+- Episodes per epoch: 100
+- Total epochs: 100
+
+
+Hyperparameters:
+Parameter                Value
+---------------------    ----------
+Learning rate            1e-4
+Optimizer                AdamW
+Weight decay             1e-4
+Batch size (episode)     16
+Embedding dim            128
+Distance metric          Euclidean
+LR scheduler             ReduceLROnPlateau (factor=0.5, patience=5)
+
+================================================================================
+5. EVALUATION METRICS
+================================================================================
+
+Primary Metrics:
+1. Accuracy = (TP + TN) / Total
+2. Macro-Precision = Σ(Precision_class) / N_classes
+3. Macro-Recall = Σ(Recall_class) / N_classes
+4. Macro-F1 = 2 × (Macro-Prec × Macro-Rec) / (Macro-Prec + Macro-Rec)
+
+Secondary Metrics:
+5. Quadratic Weighted Kappa (QWK)
+   - Formula: κ = 1 - Σ(w_ij × O_ij) / Σ(w_ij × E_ij)
+   - Weight: w_ij = (i-j)² / (N-1)²
+   - Range: [-1, 1], ideal → 1
+
+Per-Class Metrics:
+- Precision_c = TP_c / (TP_c + FP_c)
+- Recall_c = TP_c / (TP_c + FN_c)
+- F1_c = 2 × (Prec_c × Rec_c) / (Prec_c + Rec_c)
+
+Confusion Matrix Analysis:
+- Diagonal elements (correct predictions)
+- Off-diagonal patterns (misclassifications)
+- Adjacent class confusion (e.g., Class 2 ↔ Class 3)
+
+Focus: Minority class performance (Class 1 & Class 3 recall)
+
+================================================================================
+6. TOOLS DAN ENVIRONMENT
+================================================================================
+
+Komponen           Spesifikasi
+-----------------  -------------------------------------------------------
+Bahasa Pemrograman Python 3.8+
+Deep Learning      PyTorch 1.12+, torchvision
+Preprocessing      OpenCV 4.5+, PIL
+Data Analysis      NumPy, Pandas
+Visualization      Matplotlib, Seaborn
+Evaluation         scikit-learn, sklearn.metrics
+Logging            TensorBoard, wandb (optional)
+
+Platform           Google Colab / Kaggle Notebooks / Local GPU
+GPU                NVIDIA (CUDA 11.3+, min 8GB VRAM)
+RAM                Minimum 16GB
+Storage            50GB (dataset + checkpoints)
+
+Dataset Source:
+https://www.kaggle.com/c/aptos2019-blindness-detection/data
+
+================================================================================
+7. STATISTICAL ANALYSIS
+================================================================================
+
+Comparative Analysis:
+Baseline (EfficientNet-B0 + Softmax) vs Proposed (Hybrid Model)
+
+Statistical Test:
+- Paired t-test untuk significance testing
+- Confidence level: 95% (α=0.05)
+- Null hypothesis: No difference between models
+- Alternative: Hybrid model performs better
+
+Multiple Runs:
+- Random seed: [42, 123, 456, 789, 2024]
+- Report: Mean ± Std of metrics
+- Statistical significance: p-value < 0.05
+
+Visualization:
+- Box plots untuk metric distributions
+- Confusion matrices (baseline vs hybrid)
+- t-SNE plots (embedding space visualization)
+- Prototype positions dalam 2D space
+
+================================================================================
+8. EKSPEKTASI HASIL
+================================================================================
+
+Expected Outcomes:
+
+1. Overall Performance:
+   - Macro-F1 improvement: +5% - +10% vs baseline
+   - QWK improvement: +0.05 - +0.10 vs baseline
+
+2. Minority Class Performance:
+   - Class 1 (Mild) recall: +10% - +15% vs baseline
+   - Class 3 (Severe) recall: +15% - +20% vs baseline
+
+3. Embedding Quality:
+   - Higher inter-class separability (t-SNE visualization)
+   - Lower intra-class variance
+
+4. Trade-offs:
+   - Training time: +30% - +50% (episodic overhead)
+   - Inference time: Similar to baseline (no overhead)
+
+5. Best Case Scenario:
+   - Macro-F1: >0.75
+   - QWK: >0.80
+   - Minority recall: >0.70 for Class 1 & Class 3
+
+6. Insights:
+   - Identify most confused class pairs
+   - Understand feature importance via embedding analysis
+   - Validate few-shot learning untuk medical imbalance
+
+Success Criteria:
+✓ Statistical significant improvement (p < 0.05)
+✓ Balanced performance across classes (macro-metrics)
+✓ No severe degradation pada majority classes
+✓ Reproducible results (multiple seeds)

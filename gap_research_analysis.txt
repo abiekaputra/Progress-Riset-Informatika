@@ -1,0 +1,230 @@
+
+================================================================================
+              GAP RESEARCH ANALYSIS
+================================================================================
+
+Peneliti: Abi Eka Putra Wulyono (22081010190)
+Topik: Hybrid EfficientNet-B0 & Prototypical Network for DR Classification
+
+================================================================================
+1. KEKUATAN DAN KELEMAHAN PENDEKATAN EXISTING
+================================================================================
+
+A. EFFICIENTNET-BASED APPROACHES
+---------------------------------
+
+Kekuatan:
+✓ State-of-the-art performance pada berbagai vision tasks
+✓ Compound scaling menghasilkan model efisien
+✓ Transfer learning efektif dari ImageNet
+✓ MBConv blocks cocok untuk fine-grained features
+
+Kelemahan:
+✗ Performa pada kelas minoritas masih suboptimal
+✗ Belum mengeksplorasi few-shot learning approach
+✗ Memerlukan large dataset untuk training optimal
+✗ Traditional classifier (softmax) tidak handle imbalance well
+
+Contoh Penelitian:
+- Arora et al. [16]: Ensemble EfficientNet → Acc >90%, tapi kompleks
+- Ahmed [17]: EfficientNetB0 + Transfer Learning → Avg 85%, class imbalance
+- Xu et al. [33]: Hybrid EfficientNet+Swin → Acc 97%, tapi computational heavy
+
+
+B. PROTOTYPICAL NETWORK APPROACHES
+-----------------------------------
+
+Kekuatan:
+✓ Excellent few-shot learning capability
+✓ Metric-based learning robust terhadap limited data
+✓ Prototype formation cocok untuk class imbalance
+✓ Tidak memerlukan resampling atau heavy augmentation
+
+Kelemahan:
+✗ Belum banyak applied pada medical imaging
+✗ Custom architectures kurang transferable
+✗ Tidak menggunakan efficient backbone (EfficientNet)
+✗ Limited evaluation pada public DR datasets
+
+Contoh Penelitian:
+- Murugappan [34]: DRNet (ProtoNet+Attention) → 99.73%, tapi custom CNN
+- Ouahab [26]: ProtoMed → Stable features, tapi not DR-specific
+- Quan [37]: Dual-Channel ProtoNet → 85.2%, tapi pathology domain
+
+
+================================================================================
+2. RESEARCH GAP (CELAH PENELITIAN)
+================================================================================
+
+GAP 1: Ketiadaan Integrasi EfficientNet-B0 + Prototypical Network
+-------------------------------------------------------------------
+
+Temuan dari Literature Review:
+├─ 12 paper: EfficientNet variants TANPA Prototypical Network
+├─ 8 paper: Prototypical Network TANPA EfficientNet
+└─ 0 paper: Integration keduanya untuk DR pada APTOS 2019
+
+Mengapa ini GAP?
+- Synergy potential: Efficient features + Few-shot learning
+- End-to-end optimization belum dieksplorasi
+- Perfect match untuk DR challenges (imbalance, subtle features)
+
+
+GAP 2: Few-Shot Learning untuk Medical Class Imbalance
+-------------------------------------------------------
+
+Traditional Methods (yang sudah banyak):
+- Resampling (SMOTE, ADASYN)
+- Cost-sensitive learning (class weights, focal loss)
+- Data augmentation (geometric, color)
+
+Limitasi:
+✗ Synthetic data dapat mengurangi medical integrity
+✗ Hyperparameter tuning sensitif
+✗ Computational overhead
+
+Few-Shot Alternative (yang belum banyak):
+✓ Tidak memerlukan synthetic data
+✓ Metric learning naturally handle imbalance
+✓ Generalization pada minority classes
+
+Why Gap Exists:
+- Few-shot learning jarang di-apply untuk medical imbalance
+- Community lebih familiar dengan traditional methods
+- Perceived complexity dalam episodic training
+
+
+GAP 3: Evaluasi Komprehensif Focus Minority Classes
+----------------------------------------------------
+
+Existing Patterns:
+- Overall accuracy (biased toward majority)
+- Weighted F1 (still biased)
+- Limited per-class analysis
+
+What's Missing:
+- Macro-averaged metrics (equal weight per class)
+- QWK untuk ordinal classification
+- Detailed minority class performance analysis
+- Embedding space visualization
+
+Penelitian Ini:
+✓ Macro-Precision, Macro-Recall, Macro-F1
+✓ Quadratic Weighted Kappa (Kaggle metric)
+✓ Per-class confusion analysis
+✓ Focus: Class 1 (370 samples) & Class 3 (193 samples)
+
+
+================================================================================
+3. NOVELTY PENELITIAN
+================================================================================
+
+Aspek              Kebaruan
+----------------   --------------------------------------------------------
+Metode             First integration EfficientNet-B0 + Prototypical Network
+                   End-to-end episodic training (bukan two-stage)
+
+Objek Data         APTOS 2019 dengan severe class imbalance (ratio 9.35:1)
+                   Public dataset → reproducible research
+
+Pendekatan         Few-shot learning untuk medical class imbalance
+                   Alternative to resampling/augmentation
+
+Evaluasi           Comprehensive: Macro-metrics + QWK + per-class analysis
+                   Focus minoritas: Class 1 (Mild) & Class 3 (Severe)
+
+Kontribusi         Methodology template untuk medical imbalanced classification
+                   Baseline performance untuk future research
+
+
+================================================================================
+4. REFERENSI KUNCI
+================================================================================
+
+EfficientNet-Based DR Classification:
+[16] L. Arora et al., "Ensemble deep learning and EfficientNet for accurate
+     diagnosis of diabetic retinopathy," Sci Rep, 2024.
+     
+[17] F. Ahmed, "Addressing High Class Imbalance in Multi-Class Diabetic
+     Retinopathy Severity Grading," arXiv:2507.17121, 2025.
+
+[33] H. Xu et al., "A hybrid neural network approach for classifying diabetic
+     retinopathy subtypes," Front Med, 2024.
+
+
+Prototypical Network Medical Imaging:
+[34] M. Murugappan et al., "A novel few-shot classification framework for
+     diabetic retinopathy detection," Measurement, 2022.
+
+[26] A. Ouahab and O. Ben Ahmed, "ProtoMed: Prototypical networks with
+     auxiliary regularization," Image Vis Comput, 2025.
+
+[37] H. Quan et al., "Dual-Channel Prototype Network for Few-Shot Pathology
+     Image Classification," IEEE J Biomed Health Inform, 2024.
+
+
+Few-Shot Learning Theory:
+[23] J. Snell et al., "Prototypical Networks for Few-shot Learning,"
+     arXiv:1703.05175, 2017.
+
+[22] K. He et al., "Few-shot and meta-learning methods for image understanding:
+     a survey," Int J Multimed Inf Retr, 2023.
+
+
+Dataset & Class Imbalance:
+[20] C. J. Hellín et al., "Unraveling the Impact of Class Imbalance on
+     Deep-Learning Models," Applied Sciences, 2024.
+
+[21] E. Pachetti and S. Colantonio, "A systematic review of few-shot learning
+     in medical imaging," Artif Intell Med, 2024.
+
+
+================================================================================
+5. POSITIONING PENELITIAN
+================================================================================
+
+          EfficientNet Literature
+                  │
+        ┌─────────┴─────────┐
+        │                   │
+    Ensemble [16]      Transfer [17]
+    Hybrid [33]
+        │                   │
+        └─────────┬─────────┘
+                  │
+            [GAP 1 & 2]
+       No Integration with
+       Few-Shot Learning
+                  │
+                  ▼
+          ┌───────────────┐
+          │ PENELITIAN    │ ◄─── Novel Contribution
+          │     INI       │
+          └───────────────┘
+                  │
+            [GAP 3]
+       Comprehensive Evaluation
+       Focus Minority Classes
+                  │
+                  ▼
+       Prototypical Network
+            Literature
+                  │
+        ┌─────────┴─────────┐
+        │                   │
+    DRNet [34]         ProtoMed [26]
+    Dual-Chan [37]
+        │                   │
+        └─────────┬─────────┘
+                  │
+                  ▼
+           APTOS 2019 Dataset
+         (Public, Reproducible)
+
+
+Unique Value Proposition:
+1. Novel architecture: EfficientNet-B0 + ProtoNet (first for DR)
+2. Few-shot approach: Alternative untuk class imbalance handling
+3. End-to-end training: Joint optimization fitur & prototype
+4. Comprehensive eval: Macro-metrics + QWK + minority focus
+5. Public dataset: APTOS 2019 → reproducible research
