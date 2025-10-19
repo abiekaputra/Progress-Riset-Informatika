@@ -30,7 +30,7 @@ Phase 2: DATA PREPARATION (Week 3-4)
 ├─ Class distribution analysis
 ├─ Preprocessing implementation:
 │  ├─ Circle Crop
-│  ├─ Ben Graham preprocessing
+│  ├─ Enhanced Green preprocessing
 │  └─ Normalization & Resize
 └─ Stratified train-val split (80:20)
 
@@ -93,7 +93,7 @@ Method:
 4. Find largest contour (retina)
 5. Crop to bounding box + padding
 
-Step 2: Ben Graham Preprocessing
+Step 2: Enhanced Green Preprocessing
 Tujuan: Enhance vessel contrast, standardize illumination
 Method:
 1. Compute local average color (Gaussian σ=10)

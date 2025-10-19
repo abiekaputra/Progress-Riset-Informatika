@@ -78,7 +78,7 @@ Tujuan Utama:
    klasifikasi, khususnya pada kelas minoritas (Mild & Severe)
 
 Tujuan Spesifik:
-- Implementasi preprocessing (Circle Crop, Ben Graham)
+- Implementasi preprocessing (Circle Crop, Enhanced Green)
 - Membangun pipeline episodic training
 - Evaluasi menggunakan macro-averaged metrics & QWK
 - Analisis embedding space dan prototype positions
